@@ -1,0 +1,5 @@
+target
+src/main/resources/com/alyx/jynamo/creds.properties
+jynamo.ipr
+jynamo.iws
+out
