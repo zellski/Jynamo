@@ -27,12 +27,12 @@ public class CreateTable extends CmdHandler {
 
     @Override
     public void execute (JynParser parser, String[] input, OptionSpec<String> table, boolean justTypes) {
-        OptionSpec<String> hashKey = parser.stringOpt(
-                "hash-key", "The name of the Table's main key; required for table creation.", null);
+        OptionSpec<String> hashKeyName = parser.stringOpt(
+                "hash-key-name", "The name of the Table's main key; required for table creation.", null);
         OptionSpec<String> hashKeyType = parser.stringOpt(
                 "hash-type", "The attribute type of the hash key: S or N.", null);
-        OptionSpec<String> rangeKey = parser.stringOpt(
-                "range-key", "The name of the Table's optional range key; for table creation.", null);
+        OptionSpec<String> rangeKeyName = parser.stringOpt(
+                "range-key-name", "The name of the Table's optional range key; for table creation.", null);
         OptionSpec<String> rangeKeyType = parser.stringOpt(
                 "range-type", "The attribute type of the range key: S or N.", null);
         // TODO: default value parsing is all fucked up
@@ -48,13 +48,13 @@ public class CreateTable extends CmdHandler {
         JynParser.JynOptions opts = parser.jynParse(input);
 
         KeySchemaElement hashElement= new KeySchemaElement()
-                .withAttributeName(opts.require(hashKey))
+                .withAttributeName(opts.require(hashKeyName))
                 .withAttributeType(opts.require(hashKeyType));
         KeySchema schema = new KeySchema()
                 .withHashKeyElement(hashElement);
-        if (opts.has(rangeKey)) {
+        if (opts.has(rangeKeyName)) {
             KeySchemaElement rangeElement= new KeySchemaElement()
-                    .withAttributeName(opts.require(rangeKey))
+                    .withAttributeName(opts.require(rangeKeyName))
                     .withAttributeType(opts.require(rangeKeyType));
             schema.setRangeKeyElement(rangeElement);
         }
