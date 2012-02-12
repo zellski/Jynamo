@@ -25,6 +25,12 @@ public class ListTables extends CmdHandler {
     }
 
     @Override
+    public String help () {
+        return (" list\n" +
+                "   Enumerates all existing tables and outputs their names as a JSON array.");
+    }
+
+    @Override
     public void execute (JynParser parser, String[] input, OptionSpec<String> table, boolean justTypes) {
         if (justTypes) {
             return;

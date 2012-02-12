@@ -12,6 +12,8 @@ import com.amazonaws.services.dynamodb.model.DescribeTableRequest;
 import com.amazonaws.services.dynamodb.model.DescribeTableResult;
 import joptsimple.OptionSpec;
 
+import java.util.List;
+
 import static com.alyx.Log.log;
 
 public class DescribeTable extends CmdHandler {
@@ -25,14 +27,18 @@ public class DescribeTable extends CmdHandler {
     }
 
     @Override
-    public void execute (JynParser parser, String[] input, OptionSpec<String> table, boolean justTypes) {
-        if (justTypes) {
+    public String help () {
+        return (" describe <table>\n" +
+                "   Prints a JSON summary of a table; its key, configured throughput, current size, etc.");
+    }
+
+    @Override
+    public void execute (JynParser.JynOptions opts, List<String> args) {
+        if (args.size() != 1) {
+            System.err.println("Usage: " + help());
             return;
         }
-
-        JynParser.JynOptions opts = parser.jynParse(input);
-
-        String tableName = opts.valueOf(table);
+        String tableName = args.get(0);
         DescribeTableRequest request = new DescribeTableRequest()
                 .withTableName(tableName);
         DescribeTableResult result = _client.describeTable(request);

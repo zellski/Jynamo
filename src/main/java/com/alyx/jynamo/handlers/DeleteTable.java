@@ -17,6 +17,8 @@ import com.amazonaws.services.dynamodb.model.KeySchemaElement;
 import com.amazonaws.services.dynamodb.model.ProvisionedThroughput;
 import joptsimple.OptionSpec;
 
+import java.util.List;
+
 import static com.alyx.Log.log;
 
 public class DeleteTable extends CmdHandler {
@@ -30,14 +32,18 @@ public class DeleteTable extends CmdHandler {
     }
 
     @Override
-    public void execute (JynParser parser, String[] input, OptionSpec<String> table, boolean justTypes) {
-        if (justTypes) {
+    public String help () {
+        return (" delete <tableName>\n" +
+                "   Deletes an existing table from the DB. Be careful! There is no confirmation prompt!");
+    }
+
+    @Override
+    public void execute (JynParser.JynOptions opts, List<String> args) {
+        if (args.size() != 1) {
+            System.err.println("Usage: " + help());
             return;
         }
-
-        JynParser.JynOptions opts = parser.jynParse(input);
-
-        String tableName = opts.valueOf(table);
+        String tableName = args.get(0);
         DeleteTableRequest request = new DeleteTableRequest()
                 .withTableName(tableName);
         DeleteTableResult result = _client.deleteTable(request);
