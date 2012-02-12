@@ -11,15 +11,22 @@ import java.util.List;
 import com.alyx.jynamo.handlers.CreateTable;
 import com.alyx.jynamo.handlers.DeleteTable;
 import com.alyx.jynamo.handlers.DescribeTable;
+import com.alyx.jynamo.handlers.GetItem;
 import com.alyx.jynamo.handlers.ListTables;
+import com.alyx.jynamo.handlers.PutItem;
 import com.amazonaws.auth.AWSCredentials;
 import com.amazonaws.auth.PropertiesCredentials;
 import com.amazonaws.services.dynamodb.AmazonDynamoDBClient;
+import com.google.common.base.Function;
+import com.google.common.base.Joiner;
+import com.google.common.collect.Iterables;
 import com.google.common.collect.Lists;
 import joptsimple.OptionException;
 import joptsimple.OptionParser;
 import joptsimple.OptionSet;
 import joptsimple.OptionSpec;
+
+import javax.annotation.Nullable;
 
 import static com.alyx.Log.log;
 
@@ -67,16 +74,13 @@ public class ConsoleApp
         parser.noArgOpt("help", "Prints this help.");
         parser.noArgOpt("dry-run", "Do not actually modify the DB in any way.");
 
-        // the one option which is always required, no matter what
-        OptionSpec<String> table = parser.stringOpt("table", "The DynamoDB table on which to operate.", null);
-
         for (CmdHandler handler : _handlers) {
-            handler.execute(parser, null, null, true);
+            handler.configure(parser);
         }
 
-        OptionSet options;
+        JynParser.JynOptions options;
         try {
-            options = parser.parse(input);
+            options = parser.jynParse(input);
 
         } catch (OptionException oe) {
             System.err.println("Syntax error: " + oe.getMessage());
@@ -87,31 +91,40 @@ public class ConsoleApp
             return printHelpAndExit(parser);
         }
         List<String> args = options.nonOptionArguments();
-        if (args.size() != 1) {
-            System.err.println("All commands are single words only. Any other arguments must be provided as options:");
+        if (args.size() == 0) {
+            System.err.println("You must provide a single-word command:");
             return printHelpAndExit(parser);
         }
 
         String cmd = args.get(0);
+        args = args.subList(1, args.size());
+
         boolean handled = false;
         for (CmdHandler handler : _handlers) {
             if (handler.handlesCommand().equals(cmd)) {
-                handler.execute(parser, input, table, false);
+                // send in options and the "rest" of the arguments
+                handler.execute(options, args);
                 handled = true;
                 break;
             }
         }
 
         if (!handled) {
-            System.err.println("Unknown command: " + args.get(0) + "\n");
+            System.err.println("Unknown command: " + cmd + "\n");
             return printHelpAndExit(parser);
         }
         return 0;
     }
 
-    protected static int printHelpAndExit (OptionParser parser) {
+    protected int printHelpAndExit (OptionParser parser) {
         try {
+            System.err.println("Available commands: ");
+            for (CmdHandler handler : _handlers) {
+                System.err.println(handler.help());
+            }
+            System.err.println("==================================================================================");
             parser.printHelpOn(System.err);
+
         } catch (IOException e) {
             log.error("Things are very bad.");
         }
@@ -129,5 +142,7 @@ public class ConsoleApp
         _cmdClasses.add(DeleteTable.class);
         _cmdClasses.add(DescribeTable.class);
         _cmdClasses.add(ListTables.class);
+        _cmdClasses.add(PutItem.class);
+        _cmdClasses.add(GetItem.class);
     }
 }
