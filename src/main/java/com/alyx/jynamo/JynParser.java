@@ -6,6 +6,8 @@ package com.alyx.jynamo;
 import com.google.common.base.Preconditions;
 import joptsimple.*;
 
+import java.util.List;
+
 import static com.alyx.Log.log;
 
 public class JynParser extends OptionParser {
@@ -27,7 +29,7 @@ public class JynParser extends OptionParser {
      * Add a command line with an argument which may be either required or optional.
      */
     public OptionSpec<Integer> intOpt (String option, String desc, Integer defVal) {
-        return argOpt(option, desc, defVal.toString()).ofType(Integer.class);
+        return argOpt(option, desc, (defVal != null) ? defVal.toString() : null).ofType(Integer.class);
      }
 
     protected ArgumentAcceptingOptionSpec<String> argOpt (String option, String desc, String defVal) {
@@ -53,13 +55,19 @@ public class JynParser extends OptionParser {
 
         public <V> V require (OptionSpec<V> option) {
             V val = option.value(_opts);
-            log.info("requireOpt", "val", val, "type", val.getClass());
             return Preconditions.checkNotNull(option.value(_opts),
                     "This operation requires the " + option.toString() + " option.");
         }
 
+        public List<String> nonOptionArguments () {
+            return _opts.nonOptionArguments();
+        }
         public boolean has (OptionSpec<String> opt) {
             return _opts.has(opt);
+        }
+
+        public boolean has (String optName) {
+            return _opts.has(optName);
         }
 
         public <V> V valueOf (OptionSpec<V> opt) {
