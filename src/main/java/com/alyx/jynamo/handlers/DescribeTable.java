@@ -35,7 +35,6 @@ public class DescribeTable extends CmdHandler {
         String tableName = opts.valueOf(table);
         DescribeTableRequest request = new DescribeTableRequest()
                 .withTableName(tableName);
-        log.info("Describing table", "request", request);
         DescribeTableResult result = _client.describeTable(request);
 
         System.out.println("DESCRIBE TABLE: " + result);

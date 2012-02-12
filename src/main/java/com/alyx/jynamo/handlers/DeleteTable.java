@@ -40,7 +40,6 @@ public class DeleteTable extends CmdHandler {
         String tableName = opts.valueOf(table);
         DeleteTableRequest request = new DeleteTableRequest()
                 .withTableName(tableName);
-        log.info("Deleting table", "request", request);
         DeleteTableResult result = _client.deleteTable(request);
 
         System.out.println("DELETE TABLE: " + result);
