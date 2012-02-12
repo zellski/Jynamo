@@ -11,6 +11,7 @@ import java.util.List;
 import com.alyx.jynamo.handlers.CreateTable;
 import com.alyx.jynamo.handlers.DeleteTable;
 import com.alyx.jynamo.handlers.DescribeTable;
+import com.alyx.jynamo.handlers.ListTables;
 import com.amazonaws.auth.AWSCredentials;
 import com.amazonaws.auth.PropertiesCredentials;
 import com.amazonaws.services.dynamodb.AmazonDynamoDBClient;
@@ -127,5 +128,6 @@ public class ConsoleApp
         _cmdClasses.add(CreateTable.class);
         _cmdClasses.add(DeleteTable.class);
         _cmdClasses.add(DescribeTable.class);
+        _cmdClasses.add(ListTables.class);
     }
 }
